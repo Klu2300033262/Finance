@@ -1,12 +1,11 @@
-# 🟨 Render Backend Deployment Configuration
+# 🟨 Render Backend-Only Deployment Configuration
 
-# Render-specific configuration
 version: "1"
 services:
   - type: web
     name: spendwise-backend
     env: production
-    buildCommand: "cd backend && npm ci && npm run build"
+    buildCommand: "cd backend && npm install"
     startCommand: "cd backend && npm run start:prod"
     healthCheckPath: /api/health
     healthCheckTimeout: 30000
@@ -29,39 +28,5 @@ services:
       - X-Frame-Options: "DENY"
       - X-Content-Type-Options: "nosniff"
       - Referrer-Policy: "strict-origin-when-cross-origin"
-      - Content-Security-Policy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'self';"
-    scaling:
-      min: 1
-      max: 10
-      auto: true
-    disk:
-      name: spendwise-storage
-      mountPath: /app/storage
-      sizeGB: 1
     instanceType: free
     region: oregon
-    healthCheckPath: /api/health
-    healthCheckTimeout: 30000
-
-# Build configuration
-build:
-  builder: gatsby
-  publish: dist
-  publishPath: backend
-  installCommand: "cd backend && npm ci"
-  startCommand: "cd backend && npm run start:prod"
-
-# Environment groups
-environmentGroups:
-  - name: production
-    variables:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 5000
-  - name: development
-    variables:
-      - key: NODE_ENV
-        value: development
-      - key: PORT
-        value: 5000
