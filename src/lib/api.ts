@@ -2,6 +2,10 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Debug: Log the API URL
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('VITE_API_URL env var:', import.meta.env.VITE_API_URL);
+
 class ApiService {
   private getAuthHeaders() {
     const token = localStorage.getItem('auth_token');
