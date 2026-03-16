@@ -1,15 +1,7 @@
 import { motion } from 'framer-motion';
-import { Video as LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
-interface KPICardProps {
-  title: string;
-  value: string;
-  change?: number;
-  icon: LucideIcon;
-  gradient: string;
-}
-
-export default function KPICard({ title, value, change, icon: Icon, gradient }: KPICardProps) {
+export default function KPICard({ title, value, change, icon: Icon, gradient }) {
   const isPositive = change && change > 0;
   const isNegative = change && change < 0;
 

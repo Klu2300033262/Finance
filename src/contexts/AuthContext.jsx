@@ -1,30 +1,11 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { apiService } from '../lib/api';
 
-interface User {
-  id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  createdAt: string;
-  lastLogin?: string;
-}
+const AuthContext = createContext(undefined);
 
-interface AuthContextType {
-  user: User | null;
-  session: { user: User; token: string } | null;
-  loading: boolean;
-  signUp: (email: string, password: string, firstName?: string, lastName?: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
-  updateProfile: (userData: { firstName?: string; lastName?: string }) => Promise<{ error: Error | null }>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<{ user: User; token: string } | null>(null);
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth();
   }, []);
 
-  const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
+  const signUp = async (email, password, firstName, lastName) => {
     try {
       const response = await apiService.register({ email, password, firstName, lastName });
       
@@ -63,11 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error };
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email, password) => {
     try {
       const response = await apiService.login({ email, password });
       
@@ -78,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error };
     }
   };
 
@@ -88,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
   };
 
-  const updateProfile = async (userData: { firstName?: string; lastName?: string }) => {
+  const updateProfile = async (userData) => {
     try {
       const response = await apiService.updateProfile(userData);
       
@@ -101,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error };
     }
   };
 

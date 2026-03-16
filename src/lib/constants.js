@@ -9,7 +9,7 @@ export const EXPENSE_CATEGORIES = [
   'Travel',
   'Personal Care',
   'Other',
-] as const;
+];
 
 export const INCOME_SOURCES = [
   'Salary',
@@ -18,7 +18,7 @@ export const INCOME_SOURCES = [
   'Investment',
   'Gift',
   'Other',
-] as const;
+];
 
 export const PAYMENT_METHODS = [
   'Cash',
@@ -27,16 +27,16 @@ export const PAYMENT_METHODS = [
   'UPI',
   'Net Banking',
   'Other',
-] as const;
+];
 
 export const RECURRING_FREQUENCIES = [
   { value: 'daily', label: 'Daily' },
   { value: 'weekly', label: 'Weekly' },
   { value: 'monthly', label: 'Monthly' },
   { value: 'yearly', label: 'Yearly' },
-] as const;
+];
 
-export const CATEGORY_COLORS: Record<string, string> = {
+export const CATEGORY_COLORS = {
   'Food & Dining': '#10b981',
   'Transportation': '#3b82f6',
   'Shopping': '#8b5cf6',

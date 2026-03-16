@@ -7,19 +7,9 @@ import { apiService } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { CATEGORY_COLORS } from '../lib/constants';
 
-interface DashboardData {
-  totalIncome: number;
-  totalExpenses: number;
-  balance: number;
-  savingsRate: number;
-  categoryExpenses: { category: string; amount: number }[];
-  dailyData: { date: string; income: number; expenses: number }[];
-  recentTransactions: any[];
-}
-
 export default function Dashboard() {
   const { user } = useAuth();
-  const [data, setData] = useState<DashboardData>({
+  const [data, setData] = useState({
     totalIncome: 0,
     totalExpenses: 0,
     balance: 0,
@@ -265,7 +255,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               {data.recentTransactions.map((transaction) => (
                 <div
-                  key={transaction.id}
+                   key={transaction.id || transaction._id}
                   className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all"
                 >
                   <div className="flex items-center gap-4">

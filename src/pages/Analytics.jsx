@@ -14,82 +14,24 @@ import { apiService } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { CATEGORY_COLORS } from '../lib/constants';
 
-// Advanced Analytics Interface
-interface FinancialMetrics {
-  totalIncome: number;
-  totalExpenses: number;
-  netSavings: number;
-  savingsRate: number;
-  avgDailySpending: number;
-  avgDailyIncome: number;
-  expenseRatio: number;
-  financialHealthScore: number;
-}
-
-interface CategoryAnalysis {
-  category: string;
-  amount: number;
-  percentage: number;
-  trend: 'up' | 'down' | 'stable';
-  trendValue: number;
-}
-
-interface PredictiveData {
-  month: string;
-  predictedIncome: number;
-  predictedExpenses: number;
-  confidence: number;
-}
-
-interface SpendingPattern {
-  dayOfWeek: string;
-  avgSpending: number;
-  transactionCount: number;
-}
-
-interface CashFlowData {
-  date: string;
-  inflow: number;
-  outflow: number;
-  netFlow: number;
-  cumulative: number;
-}
-
-interface GoalProgress {
-  name: string;
-  target: number;
-  current: number;
-  deadline: string;
-  progress: number;
-  status: 'on_track' | 'at_risk' | 'behind';
-}
-
-interface AIInsight {
-  type: 'warning' | 'success' | 'info' | 'opportunity';
-  title: string;
-  description: string;
-  action?: string;
-  impact: 'high' | 'medium' | 'low';
-}
-
 export default function Analytics() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'predictions' | 'patterns' | 'goals'>('overview');
+  const [activeTab, setActiveTab] = useState('overview');
   
   // Core data states
-  const [metrics, setMetrics] = useState<FinancialMetrics>({
+  const [metrics, setMetrics] = useState({
     totalIncome: 0, totalExpenses: 0, netSavings: 0, savingsRate: 0,
     avgDailySpending: 0, avgDailyIncome: 0, expenseRatio: 0, financialHealthScore: 0
   });
-  const [categoryData, setCategoryData] = useState<CategoryAnalysis[]>([]);
-  const [monthlyTrends, setMonthlyTrends] = useState<any[]>([]);
-  const [predictions, setPredictions] = useState<PredictiveData[]>([]);
-  const [spendingPatterns, setSpendingPatterns] = useState<SpendingPattern[]>([]);
-  const [cashFlow, setCashFlow] = useState<CashFlowData[]>([]);
-  const [goals, setGoals] = useState<GoalProgress[]>([]);
-  const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
-  const [comparisonData, setComparisonData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [monthlyTrends, setMonthlyTrends] = useState([]);
+  const [predictions, setPredictions] = useState([]);
+  const [spendingPatterns, setSpendingPatterns] = useState([]);
+  const [cashFlow, setCashFlow] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [aiInsights, setAiInsights] = useState([]);
+  const [comparisonData, setComparisonData] = useState([]);
 
   useEffect(() => {
     if (user) loadAdvancedAnalytics();
@@ -112,7 +54,7 @@ export default function Analytics() {
         const data = dashboardRes.data;
         const daysInPeriod = 180;
         
-        const metrics: FinancialMetrics = {
+        const metrics = {
           totalIncome: data.totalIncome,
           totalExpenses: data.totalExpenses,
           netSavings: data.balance,
@@ -124,7 +66,7 @@ export default function Analytics() {
         };
         setMetrics(metrics);
 
-        const categories: CategoryAnalysis[] = (data.categoryExpenses || []).map((cat: any, idx: number) => ({
+        const categories = (data.categoryExpenses || []).map((cat, idx) => ({
           category: cat.category,
           amount: cat.amount,
           percentage: data.totalExpenses > 0 ? (cat.amount / data.totalExpenses) * 100 : 0,
@@ -133,7 +75,7 @@ export default function Analytics() {
         }));
         setCategoryData(categories);
 
-        const trends = (trendsRes.data?.trends || []).map((t: any) => ({
+        const trends = (trendsRes.data?.trends || []).map((t) => ({
           month: new Date(t.date).toLocaleString('default', { month: 'short', year: '2-digit' }),
           income: t.income,
           expenses: t.expenses,
@@ -156,7 +98,7 @@ export default function Analytics() {
     }
   };
 
-  const calculateHealthScore = (savingsRate: number, income: number, expenses: number): number => {
+  const calculateHealthScore = (savingsRate, income, expenses) => {
     let score = 0;
     score += Math.min(savingsRate * 1.5, 40);
     score += income > 0 ? 20 : 0;
@@ -165,7 +107,7 @@ export default function Analytics() {
     return Math.min(Math.round(score), 100);
   };
 
-  const generatePredictions = (trends: any[]): PredictiveData[] => {
+  const generatePredictions = (trends) => {
     if (trends.length < 3) return [];
     const avgIncome = trends.reduce((sum, t) => sum + t.income, 0) / trends.length;
     const avgExpenses = trends.reduce((sum, t) => sum + t.expenses, 0) / trends.length;
@@ -179,7 +121,7 @@ export default function Analytics() {
     }));
   };
 
-  const generateSpendingPatterns = (): SpendingPattern[] => {
+  const generateSpendingPatterns = () => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days.map(day => ({
       dayOfWeek: day,
@@ -188,9 +130,9 @@ export default function Analytics() {
     }));
   };
 
-  const generateCashFlow = (dailyData: any[]): CashFlowData[] => {
+  const generateCashFlow = (dailyData) => {
     let cumulative = 0;
-    return dailyData.slice(-30).map((day: any) => {
+    return dailyData.slice(-30).map((day) => {
       const netFlow = (day.income || 0) - (day.expenses || 0);
       cumulative += netFlow;
       return {
@@ -203,7 +145,7 @@ export default function Analytics() {
     });
   };
 
-  const generateGoals = (metrics: FinancialMetrics): GoalProgress[] => {
+  const generateGoals = (metrics) => {
     const monthlySavings = metrics.netSavings / 6;
     return [
       {
@@ -233,8 +175,8 @@ export default function Analytics() {
     ];
   };
 
-  const generateAIInsights = (metrics: FinancialMetrics, categories: CategoryAnalysis[]): AIInsight[] => {
-    const insights: AIInsight[] = [];
+  const generateAIInsights = (metrics, categories) => {
+    const insights = [];
     
     if (metrics.savingsRate < 20) {
       insights.push({
@@ -277,7 +219,7 @@ export default function Analytics() {
     return insights;
   };
 
-  const generateComparisonData = (trends: any[]) => {
+  const generateComparisonData = (trends) => {
     if (trends.length < 2) return [];
     const current = trends[trends.length - 1];
     const previous = trends[trends.length - 2];
@@ -308,7 +250,7 @@ export default function Analytics() {
           <p className="text-gray-400">AI-powered insights, predictions, and comprehensive financial analysis</p>
         </div>
         <div className="flex gap-2">
-          {(['overview', 'predictions', 'patterns', 'goals'] as const).map(tab => (
+          {['overview', 'predictions', 'patterns', 'goals'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -441,7 +383,7 @@ export default function Analytics() {
               value={`₹${metrics.totalIncome.toLocaleString()}`} 
               icon={TrendingUp} 
               color="green" 
-              trend={+12.5}
+              trend={12.5}
             />
             <MetricCard 
               title="Total Expenses" 
@@ -461,7 +403,7 @@ export default function Analytics() {
               value={`₹${metrics.netSavings.toLocaleString()}`} 
               icon={Wallet} 
               color="cyan" 
-              trend={metrics.netSavings > 0 ? +8.3 : -8.3}
+              trend={metrics.netSavings > 0 ? 8.3 : -8.3}
             />
           </div>
 
@@ -489,7 +431,7 @@ export default function Analytics() {
                     </Pie>
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                      formatter={(value: number) => `₹${value.toLocaleString()}`}
+                      formatter={(value) => `₹${value.toLocaleString()}`}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -528,7 +470,7 @@ export default function Analytics() {
                     <YAxis stroke="#9ca3af" tick={{ fontSize: 11 }} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                      formatter={(value: number) => `₹${value.toLocaleString()}`}
+                      formatter={(value) => `₹${value.toLocaleString()}`}
                     />
                     <Area type="monotone" dataKey="income" stroke="#10b981" fillOpacity={1} fill="url(#colorIncome)" />
                     <Area type="monotone" dataKey="expenses" stroke="#ef4444" fillOpacity={1} fill="url(#colorExpenses)" />
@@ -560,7 +502,7 @@ export default function Analytics() {
                 <YAxis stroke="#9ca3af" />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                  formatter={(value: number, name: string) => [`₹${value.toLocaleString()}`, name]}
+                  formatter={(value, name) => [`₹${value.toLocaleString()}`, name]}
                 />
                 <Legend />
                 <Line type="monotone" dataKey="predictedIncome" stroke="#10b981" strokeWidth={3} name="Predicted Income" strokeDasharray="5 5" />
@@ -634,7 +576,7 @@ export default function Analytics() {
                   <YAxis stroke="#9ca3af" />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                    formatter={(value: number) => `₹${value.toLocaleString()}`}
+                    formatter={(value) => `₹${value.toLocaleString()}`}
                   />
                   <Area type="monotone" dataKey="cumulative" stroke="#3b82f6" fill="url(#colorNet)" name="Cumulative" />
                   <Bar dataKey="inflow" fill="#10b981" name="Inflow" barSize={10} />
@@ -725,14 +667,8 @@ export default function Analytics() {
   );
 }
 
-function MetricCard({ title, value, icon: Icon, color, trend }: { 
-  title: string; 
-  value: string; 
-  icon: any; 
-  color: string;
-  trend?: number;
-}) {
-  const colorClasses: Record<string, string> = {
+function MetricCard({ title, value, icon: Icon, color, trend }) {
+  const colorClasses = {
     green: 'from-green-600 to-emerald-500',
     red: 'from-red-600 to-pink-500',
     blue: 'from-blue-600 to-cyan-500',

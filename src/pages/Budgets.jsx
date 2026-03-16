@@ -5,23 +5,10 @@ import { apiService } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { EXPENSE_CATEGORIES, CATEGORY_COLORS } from '../lib/constants';
 
-interface Budget {
-  id: string;
-  category: string;
-  amount: number;
-  month: string;
-}
-
-interface CategorySpending {
-  category: string;
-  spent: number;
-  budget: number;
-}
-
 export default function Budgets() {
   const { user } = useAuth();
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-  const [spending, setSpending] = useState<CategorySpending[]>([]);
+  const [budgets, setBudgets] = useState([]);
+  const [spending, setSpending] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     category: EXPENSE_CATEGORIES[0],
@@ -58,7 +45,7 @@ export default function Budgets() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
 
@@ -72,6 +59,7 @@ export default function Budgets() {
       setFormData({
         amount: '',
         category: EXPENSE_CATEGORIES[0],
+        month: new Date().toISOString().slice(0, 7),
       });
       setShowForm(false);
       loadBudgets();
@@ -81,7 +69,7 @@ export default function Budgets() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id) => {
     try {
       await apiService.deleteBudget(id);
       loadBudgets();
@@ -90,21 +78,21 @@ export default function Budgets() {
     }
   };
 
-  const getStatusColor = (spent: number, budget: number) => {
+  const getStatusColor = (spent, budget) => {
     const percentage = (spent / budget) * 100;
     if (percentage >= 100) return 'text-red-400';
     if (percentage >= 80) return 'text-amber-400';
     return 'text-green-400';
   };
 
-  const getProgressColor = (spent: number, budget: number) => {
+  const getProgressColor = (spent, budget) => {
     const percentage = (spent / budget) * 100;
     if (percentage >= 100) return 'from-red-600 to-red-500';
     if (percentage >= 80) return 'from-amber-600 to-amber-500';
     return 'from-green-600 to-green-500';
   };
 
-  const getStatusIcon = (spent: number, budget: number) => {
+  const getStatusIcon = (spent, budget) => {
     const percentage = (spent / budget) * 100;
     if (percentage >= 100) return <AlertTriangle className="w-5 h-5" />;
     if (percentage >= 80) return <AlertTriangle className="w-5 h-5" />;

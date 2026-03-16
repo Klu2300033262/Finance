@@ -6,24 +6,11 @@ import { apiService } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { INCOME_SOURCES } from '../lib/constants';
 
-interface Income {
-  id: string;
-  amount: number;
-  category: string;
-  description: string;
-  date: string;
-}
-
 export default function Income() {
   const { user } = useAuth();
-  const [incomes, setIncomes] = useState<Income[]>([]);
+  const [incomes, setIncomes] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState<{
-    amount: string;
-    source: typeof INCOME_SOURCES[number];
-    description: string;
-    date: string;
-  }>({
+  const [formData, setFormData] = useState({
     amount: '',
     source: INCOME_SOURCES[0],
     description: '',
@@ -72,7 +59,7 @@ export default function Income() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
       alert('Please login first');
@@ -93,7 +80,7 @@ export default function Income() {
       amount: parseFloat(formData.amount),
       description: formData.description.trim(),
       category: formData.source,
-      type: 'income' as const,
+      type: 'income',
       date: formData.date || new Date().toISOString().slice(0, 10),
     };
 
@@ -108,7 +95,7 @@ export default function Income() {
         // Success - reset form and close
         setFormData({
           amount: '',
-          source: INCOME_SOURCES[0] as typeof INCOME_SOURCES[number],
+          source: INCOME_SOURCES[0],
           description: '',
           date: new Date().toISOString().slice(0, 10),
         });
@@ -123,7 +110,7 @@ export default function Income() {
         console.error('API Error:', response.message);
         alert('Error: ' + (response.message || 'Failed to add income'));
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error adding income:', error);
       alert('Error adding income: ' + (error.message || 'Unknown error'));
     } finally {
@@ -131,7 +118,7 @@ export default function Income() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id) => {
     try {
       await apiService.deleteTransaction(id);
       loadIncomes();
@@ -144,7 +131,7 @@ export default function Income() {
     const month = income.date.slice(0, 7);
     acc[month] = (acc[month] || 0) + Number(income.amount);
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
   const chartData = Object.entries(monthlyData)
     .map(([month, amount]) => ({ month, amount }))
@@ -154,7 +141,7 @@ export default function Income() {
   const sourceData = incomes.reduce((acc, income) => {
     acc[income.category] = (acc[income.category] || 0) + Number(income.amount);
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
   if (loading) {
     return <div className="text-gray-400">Loading...</div>;
@@ -200,7 +187,7 @@ export default function Income() {
               <label className="block text-sm font-medium text-gray-300 mb-2">Source</label>
               <select
                 value={formData.source}
-                onChange={(e) => setFormData({ ...formData, source: e.target.value as typeof INCOME_SOURCES[number] })}
+                onChange={(e) => setFormData({ ...formData, source: e.target.value })}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 {INCOME_SOURCES.map((source) => (

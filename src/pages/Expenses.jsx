@@ -6,21 +6,12 @@ import { apiService } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS, CATEGORY_COLORS } from '../lib/constants';
 
-interface Expense {
-  id: string;
-  amount: number;
-  category: string;
-  description: string;
-  payment_method: string;
-  date: string;
-}
-
 export default function Expenses() {
   const { user } = useAuth();
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState([]);
+  const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [formData, setFormData] = useState({
     amount: '',
     category: EXPENSE_CATEGORIES[0],
@@ -61,7 +52,7 @@ export default function Expenses() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
 
@@ -90,7 +81,7 @@ export default function Expenses() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id) => {
     try {
       await apiService.deleteTransaction(id);
       loadExpenses();
@@ -102,7 +93,7 @@ export default function Expenses() {
   const categoryData = expenses.reduce((acc, expense) => {
     acc[expense.category] = (acc[expense.category] || 0) + Number(expense.amount);
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
   const chartData = Object.entries(categoryData).map(([category, amount]) => ({
     name: category,
@@ -293,9 +284,9 @@ export default function Expenses() {
                 <div className="flex items-center gap-4">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: CATEGORY_COLORS[expense.category] + '30' }}
+                    style={{ backgroundColor: (CATEGORY_COLORS[expense.category] || '#64748b') + '30' }}
                   >
-                    <TrendingDown className="w-6 h-6" style={{ color: CATEGORY_COLORS[expense.category] }} />
+                    <TrendingDown className="w-6 h-6" style={{ color: CATEGORY_COLORS[expense.category] || '#64748b' }} />
                   </div>
                   <div>
                     <p className="font-medium text-white">{expense.description}</p>

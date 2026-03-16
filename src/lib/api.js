@@ -3,7 +3,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 class ApiService {
-  private getAuthHeaders() {
+  getAuthHeaders() {
     const token = localStorage.getItem('auth_token');
     return {
       'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ class ApiService {
     };
   }
 
-  private async handleResponse(response: Response) {
+  async handleResponse(response) {
     const data = await response.json();
     
     if (!response.ok) {
@@ -22,12 +22,7 @@ class ApiService {
   }
 
   // Authentication endpoints
-  async register(userData: {
-    email: string;
-    password: string;
-    firstName?: string;
-    lastName?: string;
-  }) {
+  async register(userData) {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,7 +39,7 @@ class ApiService {
     return data;
   }
 
-  async login(credentials: { email: string; password: string }) {
+  async login(credentials) {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -69,10 +64,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async updateProfile(userData: {
-    firstName?: string;
-    lastName?: string;
-  }) {
+  async updateProfile(userData) {
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
@@ -87,17 +79,8 @@ class ApiService {
   }
 
   // Transaction endpoints
-  async getTransactions(params?: {
-    type?: string;
-    category?: string;
-    startDate?: string;
-    endDate?: string;
-    page?: number;
-    limit?: number;
-    sort?: string;
-    order?: string;
-  }) {
-    const queryString = new URLSearchParams(params as any).toString();
+  async getTransactions(params) {
+    const queryString = new URLSearchParams(params).toString();
     const response = await fetch(`${API_BASE_URL}/transactions?${queryString}`, {
       headers: this.getAuthHeaders()
     });
@@ -105,7 +88,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getTransaction(id: string) {
+  async getTransaction(id) {
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
       headers: this.getAuthHeaders()
     });
@@ -113,14 +96,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async createTransaction(transactionData: {
-    amount: number;
-    description: string;
-    category: string;
-    type: 'income' | 'expense';
-    date?: string;
-    tags?: string[];
-  }) {
+  async createTransaction(transactionData) {
     console.log('API Service - Sending transaction data:', transactionData);
     const headers = this.getAuthHeaders();
     console.log('API Service - Headers:', headers);
@@ -143,14 +119,7 @@ class ApiService {
     }
   }
 
-  async updateTransaction(id: string, transactionData: Partial<{
-    amount: number;
-    description: string;
-    category: string;
-    type: 'income' | 'expense';
-    date: string;
-    tags: string[];
-  }>) {
+  async updateTransaction(id, transactionData) {
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
@@ -160,7 +129,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async deleteTransaction(id: string) {
+  async deleteTransaction(id) {
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders()
@@ -178,7 +147,7 @@ class ApiService {
   }
 
   // Budget endpoints
-  async getBudgets(period?: string) {
+  async getBudgets(period) {
     const queryString = period ? `?period=${period}` : '';
     const response = await fetch(`${API_BASE_URL}/budgets${queryString}`, {
       headers: this.getAuthHeaders()
@@ -195,14 +164,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async createBudget(budgetData: {
-    category: string;
-    amount: number;
-    period?: string;
-    startDate?: string;
-    endDate?: string;
-    alertThreshold?: number;
-  }) {
+  async createBudget(budgetData) {
     const response = await fetch(`${API_BASE_URL}/budgets`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
@@ -212,14 +174,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async updateBudget(id: string, budgetData: Partial<{
-    amount: number;
-    period: string;
-    startDate: string;
-    endDate: string;
-    alertThreshold: number;
-    isActive: boolean;
-  }>) {
+  async updateBudget(id, budgetData) {
     const response = await fetch(`${API_BASE_URL}/budgets/${id}`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
@@ -229,7 +184,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async deleteBudget(id: string) {
+  async deleteBudget(id) {
     const response = await fetch(`${API_BASE_URL}/budgets/${id}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders()
@@ -239,7 +194,7 @@ class ApiService {
   }
 
   // Analytics endpoints
-  async getDashboardAnalytics(startDate: string, endDate: string) {
+  async getDashboardAnalytics(startDate, endDate) {
     const response = await fetch(`${API_BASE_URL}/analytics/dashboard?startDate=${startDate}&endDate=${endDate}`, {
       headers: this.getAuthHeaders()
     });
@@ -247,7 +202,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getSummaryAnalytics(period?: string) {
+  async getSummaryAnalytics(period) {
     const queryString = period ? `?period=${period}` : '';
     const response = await fetch(`${API_BASE_URL}/analytics/summary${queryString}`, {
       headers: this.getAuthHeaders()
@@ -256,7 +211,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getTrendsAnalytics(period?: string, months?: number) {
+  async getTrendsAnalytics(period, months) {
     const params = new URLSearchParams({ 
       period: period || 'monthly',
       months: months?.toString() || '12'
@@ -268,7 +223,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getCategoriesAnalytics(startDate: string, endDate: string, type?: string) {
+  async getCategoriesAnalytics(startDate, endDate, type) {
     const params = new URLSearchParams({ 
       startDate, 
       endDate,
@@ -281,7 +236,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getComparisonAnalytics(currentPeriodStart: string, currentPeriodEnd: string, previousPeriodStart: string, previousPeriodEnd: string) {
+  async getComparisonAnalytics(currentPeriodStart, currentPeriodEnd, previousPeriodStart, previousPeriodEnd) {
     const params = new URLSearchParams({ 
       currentPeriodStart, 
       currentPeriodEnd,
