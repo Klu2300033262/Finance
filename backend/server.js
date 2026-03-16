@@ -43,6 +43,7 @@ const allowedOrigins = [
   'http://127.0.0.1:63947',
   'https://finance-three-mocha.vercel.app',
   'https://finance-artpjzhq9-klu2300033262s-projects.vercel.app',
+  'https://finance-bo6s9w2ek-klu2300033262s-projects.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -50,6 +51,11 @@ app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
+    
+    // Allow all Vercel domains
+    if (origin.includes('.vercel.app')) {
+      return callback(null, true);
+    }
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
